@@ -2,9 +2,16 @@ const express = require ("express");
 const app = new express();
 
 //this will match all the HTTP method  API calls to /test
-    app.use("/test", (req, res) => {
-        res.send("test Server started ")
-    })
+    app.use("/test", (req, res,next) => {
+        //res.send("test Server started ");
+        next();
+    },[(req,res,next)=>{
+        console.log("response 2");
+        // res.send("server's second response")
+        next();
+    },(req,res,next)=>{
+        res.send("third server response");
+    }])
     // this will call only  handle GET call to /user
     app.get("/user",(req,res)=>{
      res.send({firstName: "Nayana",lastName:"Kiran"})
