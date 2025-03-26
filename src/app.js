@@ -2,6 +2,8 @@ const express = require ("express");
 const app = new express();
 
 //this will match all the HTTP method  API calls to /test
+
+//route handler-middlewares, which handles req and sends res - request handler in between are middlewares
     app.use("/test", (req, res,next) => {
         //res.send("test Server started ");
         next();
