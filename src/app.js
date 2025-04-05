@@ -3,18 +3,48 @@ const connectDB = require("./config/database");
 const userModel = require("./models/user")
 const app = express(); // No need for `new`
 
-app.post("/signup", async (req,res)=>{
+app.use(express.json());
 
-    //creating new instance of userModel model
-    const user = new userModel({
-        firstName:"Kumarn",
-        lastName:"nayana",
-        emailId:"kumarcn@gmail.com",
-        password:"Kumar123",
-        age:30
-    })
-  await user.save();
-  res.send("user added succesfully")
+app.post("/signup", async (req,res)=>{
+    const user = new userModel (req.body)
+  //creating new instance of userModel model
+ try{
+    await user.save();
+    res.send("user added succesfully")
+ } catch(err){
+    res.status(400).send("Error saving user:" + err.message)
+ }
+ 
+})
+app.get("/user",async (req,res)=>{
+   
+    try{
+      const users=  await userModel.find({emailId : req.body.emailId});
+      if(users.length === 0){
+        res.status(404).send("user not found")
+      }
+      res.send(users);
+      
+    }
+    catch(err){
+        res.status(400).send("Something went wrong", + err.message)
+    }
+
+})
+//feed api - get  /feed - get all the users from database
+app.get("/feed",async (req,res)=>{
+    try{
+        const users= await userModel.find({});
+        if(users.length === 0){
+          res.status(404).send("user not found")
+        }
+        res.send(users);
+        
+      }
+      catch(err){
+          res.status(400).send("Something went wrong", + err.message)
+      }
+
 })
 
 
