@@ -40,6 +40,6 @@ const  userSchema = mongoose.Schema({
         type:String,
         default:"This is the default about of the user"
     }
-}, {timestamps: true})
+}, {timestamps: true })
 const user = mongoose.model("User",userSchema);
 module.exports = user;
