@@ -1,6 +1,7 @@
 const express = require("express");
 const connectDB = require("./config/database");
-const userModel = require("./models/user")
+const userModel = require("./models/user");
+const { ReturnDocument } = require("mongodb");
 const app = express(); // No need for `new`
 
 app.use(express.json());
@@ -58,25 +59,27 @@ app.delete("/user",async(req,res)=>{
 }
 })
 // find user and update data by user id
-// app.patch("/user",async(req,res)=>{
-//   const userId = req.body.userId;
-//   const data = req.body
+app.patch("/user",async(req,res)=>{
+  const userId = req.body.userId;
+  const data = req.body
 
-//   try{
-//    const userdata = await userModel.findByIdAndUpdate(userId, data);
-//      res.send("Updated user succesfully");
-//   }
-//   catch(err){
-//   res.status(400).send("Something went wrong")
-// }
-// })
+  try{
+   const userdata = await userModel.findByIdAndUpdate(userId, data);
+     res.send("Updated user succesfully");
+  }
+  catch(err){
+  res.status(400).send("Something went wrong")
+}
+})
 //find user and update the data by using email Id
 app.patch("/user",async(req,res)=>{
   const email = req.body.emailId;
   const data = req.body
 
   try{
-   const userdata = await userModel.updateOne({ emailId: email }, data); 
+   const userdata = await userModel.updateOne({ emailId: email }, data,{  returnDocument:"after",
+   runValidators:true }); 
+  
      res.send("Updated user using email succesfully");
   }
   catch(err){
