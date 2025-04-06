@@ -76,7 +76,12 @@ app.patch("/user",async(req,res)=>{
   const email = req.body.emailId;
   const data = req.body
 
+
   try{
+    const allowedUpdates = ["userId", "skills", "about","gender","age"]
+    const isUpdateAllowed = Object.keys(data).every((k)=> allowedUpdates.imcludes(k));
+    if( !isUpdateAllowed){throw new Error('update not allowed')}
+    if(data.skills.length > 10){ throw new Error("only 10 skills valid")}
    const userdata = await userModel.updateOne({ emailId: email }, data,{  returnDocument:"after",
    runValidators:true }); 
   
