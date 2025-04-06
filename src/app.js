@@ -46,6 +46,43 @@ app.get("/feed",async (req,res)=>{
       }
 
 })
+//delete api - delete user  from database
+app.delete("/user",async(req,res)=>{
+  const userId = req.body.userId;
+  res.send("User deleted succesfully");
+  try{
+   const userid = await userModel.findByIdAndDelete(userId)
+  }
+  catch(err){
+  res.status(400).send("Something went wrong")
+}
+})
+// find user and update data by user id
+// app.patch("/user",async(req,res)=>{
+//   const userId = req.body.userId;
+//   const data = req.body
+
+//   try{
+//    const userdata = await userModel.findByIdAndUpdate(userId, data);
+//      res.send("Updated user succesfully");
+//   }
+//   catch(err){
+//   res.status(400).send("Something went wrong")
+// }
+// })
+//find user and update the data by using email Id
+app.patch("/user",async(req,res)=>{
+  const email = req.body.emailId;
+  const data = req.body
+
+  try{
+   const userdata = await userModel.updateOne({ emailId: email }, data); 
+     res.send("Updated user using email succesfully");
+  }
+  catch(err){
+  res.status(400).send("Something went wrong")
+}
+})
 
 
 connectDB().then(() => {
