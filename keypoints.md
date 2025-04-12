@@ -5,4 +5,5 @@
 # validate() of the schema works only when creating new user it doesnt work while ur updating prev data- to make the validate work for update we have to use/enable  runvalidators:true ===>runValidators:true option in patch api
 # schema validation is very imp u cannot insert anything into database so use methods required, minLength,maxLength, default, lowercase, trim
 # trim -trims the white spaces 
-# timestamps: true - captures the tiime created and updated time
+# timestamps: true - captures the time created and updated time
+# used bcrypt for encrypting passwords

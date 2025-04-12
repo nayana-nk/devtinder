@@ -1,2 +1,5 @@
+
+# learning nodeJs
+# building - devtinder project while learning
 # devtinder
-tinder for developers
+ tinder application for developers
