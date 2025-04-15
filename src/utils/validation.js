@@ -1,17 +1,32 @@
-const validator = require ("validator");
+const validator = require("validator");
 
 const validateSignupData = (req) => {
+  const { firstName, lastName, emailId, password } = req.body;
 
-    const { firstName, lastName, emailId, password } = req.body;
+  if (!firstName || !lastName || !emailId || !password) {
+    throw new Error("All fields (firstName, lastName, emailId, and password) are required");
+  }
 
-    if (!firstName || !lastName) {
+  // Trim inputs to remove extra whitespace
+  req.body.firstName = firstName.trim();
+  req.body.lastName = lastName.trim();
+  req.body.emailId = emailId.trim();
+  req.body.password = password.trim();
 
-        throw new Error("First name or last name is missing");
-    } else if (!validator.isEmail(emailId)) {
-        throw new Error("Please enter a valid email ID");
-    } else if (!validator.isStrongPassword(password)) {
-        throw new Error("Password is not strong enough");
-    }
+  // Validate first name length
+  if (firstName.length < 3 || firstName.length > 8) {
+    throw new Error("First name must be between 3 and 8 characters");
+  }
+
+  // Validate email format
+  if (!validator.isEmail(emailId)) {
+    throw new Error("Please enter a valid email ID");
+  }
+
+  // Validate password strength
+  if (!validator.isStrongPassword(password)) {
+    throw new Error("Password is not strong enough. It must contain at least one lowercase letter, one uppercase letter, one number, and one symbol.");
+  }
 };
 
-module.exports = { validateSignupData, };
+module.exports = { validateSignupData };
