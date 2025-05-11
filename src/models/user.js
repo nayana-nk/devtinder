@@ -3,6 +3,8 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+
+
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -41,8 +43,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum:{
       values:["male","female","other"],
-      message: `{Value} is not a valid gender type`
-    }
+      message: `{Value} is not a valid gender type`,
+    },
     // validate(value) {
     //   if (!["male", "female", "other"].includes(value)) {
     //     throw new Error("Gender data is not valid");
