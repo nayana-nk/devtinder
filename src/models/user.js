@@ -1,88 +1,105 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
-
-
-const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: true,
-    minLength: 3,
-    maxLength: 8,
-  },
-  lastName: {
-    type: String,
-  },
-  emailId: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error("Not a valid email: " + value);
-      }
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+      minLength: 4,
+      maxLength: 50,
+    },
+    lastName: {
+      type: String,
+    },
+    emailId: {
+      type: String,
+      lowercase: true,
+      required: true,
+      unique: true,
+      trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email address: " + value);
+        }
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Enter a Strong Password: " + value);
+        }
+      },
+    },
+    age: {
+      type: Number,
+      min: 18,
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: ["male", "female", "other"],
+        message: `{VALUE} is not a valid gender type`,
+      },
+      // validate(value) {
+      //   if (!["male", "female", "others"].includes(value)) {
+      //     throw new Error("Gender data is not valid");
+      //   }
+      // },
+    },
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
+    membershipType: {
+      type: String,
+    },
+    photoUrl: {
+      type: String,
+      default: "https://geographyandyou.com/images/user-profile.png",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid Photo URL: " + value);
+        }
+      },
+    },
+    about: {
+      type: String,
+      default: "This is a default about of the user!",
+    },
+    skills: {
+      type: [String],
     },
   },
-  password: {
-    type: String,
-    required: true,
-    validate(value) {
-      if (!validator.isStrongPassword(value)) {
-        throw new Error("Not a strong password: " + value);
-      }
-    },
-  },
-  age: {
-    type: Number,
-  },
-  gender: {
-    type: String,
-    enum:{
-      values:["male","female","other"],
-      message: `{Value} is not a valid gender type`,
-    },
-    // validate(value) {
-    //   if (!["male", "female", "other"].includes(value)) {
-    //     throw new Error("Gender data is not valid");
-    //   }
-    // },
-  },
-  skills: {
-    type: [String],
-    default: ["react", "node"],
-  },
-  about: {
-    type: String,
-    default: "This is the default about of the user",
-  },
-}, { timestamps: true });
-
-// Pre-save hook to hash the password if modified
-userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
-    this.password = await bcrypt.hash(this.password, 10);
+  {
+    timestamps: true,
   }
-  next();
-});
+);
 
-// Instance method to validate a password
-userSchema.methods.validatePassword = async function (plainPassword) {
-  return await bcrypt.compare(plainPassword, this.password);
+userSchema.methods.getJWT = async function () {
+  const user = this;
+
+  const token = await jwt.sign({ _id: user._id }, "DEV_TINDER@23", {
+    expiresIn: "7d",
+  });
+
+  return token;
 };
 
-// Instance method to generate JWT for the user
-userSchema.methods.getJWT = function () {
-  return jwt.sign(
-    { _id: this._id.toString() },
-    "DEV_TINDER@23", // In production, move this secret to an environment variable.
-    { expiresIn: "8h" }
+userSchema.methods.validatePassword = async function (passwordInputByUser) {
+  const user = this;
+  const passwordHash = user.password;
+
+  const isPasswordValid = await bcrypt.compare(
+    passwordInputByUser,
+    passwordHash
   );
+
+  return isPasswordValid;
 };
 
-const userModel = mongoose.model("User", userSchema);
-
-module.exports = userModel;
+module.exports = mongoose.model("User", userSchema);
